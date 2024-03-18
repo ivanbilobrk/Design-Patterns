@@ -1,0 +1,26 @@
+Stvaranje objekta pd pomoću operatora new uzrokovalo je dva poziva virtualne metode virtual void virtualnaMetoda();
+Kada se prvi put pozvala ta metoda u konstruktoru roditelja od Derived, a to je Base 
+izvršila se virtualana metoda koja se nalazi u razredu Base. Drugi poziv te metode u 
+konstruktoru razreda Derived je uzrokovao to da se izvršila virutalna metoda napisana u razredu Derived.
+
+Proučavanjem strojnog koda jasno je zašto se to događa. Kada se nalazimo u konstruktoru 
+razreda Derived prvi korak je taj da se poziva konstruktor razreda roditelja, a to je 
+Base. U trenutku poziva tog konstruktora objektu još uvijek nije pridružena nijedan pokazivač na tablicu
+virtualnih funkcija. U konstruktoru Base kako je riječ o vršnom razredu koji nema nadrazreda
+prvi korak je pridruživanje tablice virtualnih funkcija novom objektu. Pokazivač koji 
+pokazuje na mjesto tablice virtualnih funkcija zapisuje se na prvih 8 byte-ova na heapu, na mjesto
+osigurano za objekt pd. Kako se nalazimo u konstruktoru razreda Base taj pokazivač pokazuje 
+upravo na njegovu tablicu virtualnih funkcija. Sada slijedi poziv funkcije void metoda();
+Ta funkcija poziva funkciju  virtual void virtualnaMetoda(); Adresa te funkcije se dobiva 
+pomoću pokazivača virtualnih funkcija. Kako je u ovom trenutku na to mjesto zapisan pokazivač
+koji pokazuje na tablicu virtualnih funkcija razreda Base pozvat će se virtual void virtualnaMetoda();
+razreda Base te će ispis biti u skladu s time. Kada je gotovo izvršavanje konstruktora 
+nadrazreda Base podešava se pokazivač na tablicu virtualnih funkcija objekta pd ponovno. Nakon tog 
+podešavanja taj pokazivač će pokazivati na tablicu virtualnih funkcija razreda Derived. 
+Zato sada kada se ponovno pozove funkcija void metoda(); ali sada iz konstruktora 
+Derived, unutar te funkcije će se pozvati funkcija virtual void virtualnaMetoda(); ali sada
+ona koja je napisana u razredu Derived jer čitanjem pokazivača na tablicu virtualnih 
+funckija dobivamo adresu te funkcije. Sada kada je gotov konstruktor Derived vraćamo se u 
+funkciju main te se opet zove funkcija void metoda(); Ovaj poziv će biti identičan zadnjem 
+pozivu te funkcije unutar konstruktora Derived te će ta funkcija isto pozvati  virtual void virtualnaMetoda();
+koja se nalazi u razredu Derived. 

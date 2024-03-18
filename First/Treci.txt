@@ -1,0 +1,14 @@
+Veličina razreda CoolClass je 16 byte-ova, a PlainOldClass 4 byte-a.
+Prvo sam mislio da će veličina razreda CoolClass biti 12 byte-ova jer imamo jedan pokazivač
+za tablicu virtualnih metoda koji je veličine 8 byte-ova te jednu člansku varijablu tipa int
+koja je veličine 4 byte-a. Razlog zašto je veličina 16 je taj što prevoditelj dodaje
+padding. Padding se dodaje tako da veličina razreda na kraju mora biti višekratnik 
+veličine najvećeg podatka koji razred pohranjuje. Ovdje je to pointer na tablicu virtualnih
+metoda. Kako je njegova veličina 8 byte-a, prevoditelj dodaje padding od 4 byte-a jer je 
+16 prvi broj nakon 12 koji je višekratnik od 8. Padding se inače može dodavati i između 
+pojedinih podataka ukoliko za to ima potrebe. Tipovi podataka zahtjevaju da budu poravnani na
+određen način (npr. int je 4 byte-no poravnan, short 2, itd.). Neki jezici dozvoljavaju i da se
+promjeni redoslijed pohrane određenih podataka kako bi čuvali prostor, te kako bi padding bio
+što manji. 
+Veličina razreda PlainOldClass je u skladu s očekivanjem i iznosi 4 byte-a jer ima jednu 
+člansku varijablu tipa int.

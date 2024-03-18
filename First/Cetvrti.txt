@@ -1,0 +1,80 @@
+1. 
+Alociranje memorije za objekte poc i *pb se odvija u funkciji main gdje vidimo naredbu 
+sub rsp, 40. Rsp je registar koji sadrži adresu vrha stoga. 
+S tom naredbom se na stogu rezervira mjesto gdje će biti pohranjena
+članska varijabla tipa int razreda PlainOldClass te pokazivač koji pokazuje na mjesto na heapu 
+gdje se nalaze članske varijable i pokazivač na tablicu virtualnih metoda razreda CoolClass.
+Mjesto na heapu se alocira naredbom call _Znwm@PLT koja alocira 16 byte-ova za primjerak razreda 
+CoolClass. Željena veličina mjesta na heapu se predaje preko registra naredbom mov	edi, 16. 
+Nakon što se alocira mjesto na heapu funkcija nam vraća pokazivač na to mjesto te se taj pokazivač pohrani 
+na stog naredbom mov QWORD PTR -32[rbp], rbx.
+
+2. 
+Razlika u načinu alociranja ova dva objekta je ta što se prostor potreban za primjerak 
+razreda PlainOldClass, tj. poc zauzima na stogu. Veličina zauzetog mjesta na stogu će biti 4 
+byte-a jer ima jednu člansku varijablu tipa int.
+Kada stvaramo primjerak razreda CoolClass sa operatorom new na stogu će se nalaziti pointer
+na mjesto na heapu koje je alocirano tijekom izvođenja te na kojem su pohranjeni svi podatci
+za taj primjerak razreda. U ovom slučaju pokazivač na stogu pokazivat će na mjesto na heapu 
+koje ima pokazivač na tablicu virtualnih funkcija te jednu člansku varijablu tipa int. 
+
+3. 
+Ne postoji poziv konstruktora objekta poc sve što je prevoditelj napravio je ostavio mjesta
+na stogu za člansku varijablu tipa int objekta poc.
+
+4.
+Kod stvaranja objekta pb prvo učitavamo u registar edi 16 jer je veličina primjerka tog razreda 
+16 (8 za pointer na tablicu virtualnih funkcija, 4 za člansku varijablu int te padding 4). 
+Registar edi je ulazni argument poziva call	_Znwm@PLT. Taj poziv je zapravo operator new s kojim
+alociramo mjesto na heapu za objekt pb. Adresa mjesta na heapu za objekt pb je vraćena putem 
+registra rax. Tu adresu spremamo na stog te nakon toga u registar rdi te će se koristit kao ulazni argument 
+u konstruktoru od CoolClass. U konstruktoru CoolClass se ulazni argument, tj. adresa mjesta 
+na heapu sprema u registar rdi te se poziva konstruktor od BaseClass. U konstruktoru BaseClass 
+se primljena adresa u rdi sprema na stog te se u rdx učitava adresa virtualne tablice od BaseClass
+pomoću naredbe lea. Sada se tih 8 byte-ova adrese tablice virtualnih funkcija sprema na heap na mjesto
+na kojem nam pokazuje adresa prethodno zapisana u stogu. Iz ovog vidimo da se pokazivač na tablicu 
+virtualnih funkcija sprema odmah na početak objekta na heapu. Nakon ovoga se vraćamo u 
+konstruktor CoolClass. Tamo se učitava u registar rdx pomoću naredbe lea adresa tablice 
+virtualnih funkcija razreda CoolClass. Sada se na adresu koja je prethodno spremljena na stog, a 
+bila je ulazni argument konstruktora sprema adresa tablice virtualnih funkcija razreda CoolClass.
+Sada vidimo da prethodno zapisana adresa tablice virtualnih funkcija razreda BaseClass je pregažena 
+ovom novom adresom. Nakon ovoga konstruktor je gotov te se vraćamo u funkciju main. U funkciji main se 
+nakon završavanja izvođenja konstruktora sprema na stog adresa mjesta na heapu primjerka razreda CoolClass.
+
+5. 
+Poziv poc.set se izvodi tako da se prvo učitala adresa mjesta na stogu na kojem se 
+nalazi mjesto za člansku varijablu int razreda PlainOldClass pomoću naredbe lea. Ta adresa
+se spremila u registar rax. Nakon toga u registar esi se spremila konstanta 42 jer je to argument
+funkcije set te se vrijednost registra rax spremila u registar rdi. Ovi registri esi i rdi se koriste 
+kao argumenti funkcija. Nakon toga slijedi poziv funkcije set koja u svom tijelu učita argumente
+iz registara, spremi ih na stog te onda na lokaciju na koju pokazuje adresa predana u 
+registru rdi (koja se sada nalazi na stogu) spremi konstantu koja je predana
+funkciji u registru esi, a sada je na stogu. Ta adresa pokazuje na mjesto 
+koje je prethodno u funkciji main bilo osigurano na stogu za člansku varijablu int. Slijedi povratak
+iz funkcije pomoću povratne adrese koja je stavljena na stog pozivom call. 
+
+Poziv pb->set je kompliciraniji jer se radi o virtualnoj funkciji. Prvo učitavamo adresu
+sa stoga u registar rax koja je prethodno dobivena nakon stvaranja objekta pb te koja pokazuje na mjesto na heapu
+koje ima pokazivač na tablicu virtualnih funkcija objekta pb te člansku varijablu tipa int. 
+Nakon što smo učitali adresu mjesta na heapu učitavamo u registar rdx adresu prve virtualne
+funkcije. Nakon toga učitavamo u registar esi konstantu 42 te u registar rdi adresu mjesta na 
+na heapu za objekt pb. Ta adresa u registru 
+rdi se koristi efektivno kao ključna riječ this u funkciji jer putem te adrese možemo pristupiti 
+svim članskim varijablama te virtualnim funkcijama. Sada slijedi poziv call rdx jer se u registru 
+rdx nalazi adresa funkcije set. U funkciji set se učitavaju parametri iz registara esi i rdi te se 
+spremaju na stog. Nakon toga se adresa koja pokazuje na mjesto na heapu objekta pb (ključna riječ this) 
+sprema sa stoga u reigstar rax. Isto tako se argument funkcije set sa stoga sprema u 
+registar edx. Sada se još vrijednost iz registra edx sprema na mjesto na koje pokazuje 
+adresa u registru rax uvećana za 8 jer je veličina pokazivača virtualnih funkcija upravo 8, a 
+odmah nakon tog pokazivača nalazi se mjesto za spremanje varijable int na heapu. Slijedi povratak 
+iz funkcije pomoću povratne adrese koja je pozivom call spremljena na stog.
+
+Manje instrukcija zahtjeva poziv poc.set jer ne moramo raditi ništa sa tablicama virtualnih 
+funkcija već se pomoću adrese funkcije ona direktno poziva. Isto tako bi optimirajući prevoditelj 
+mogao funkciju poc.set generirati direktno u funkciji main jer sve što ta funkcija radi 
+je sprema konstantu na određeno mjesto na stogu. 
+
+6.
+Tablica virtualnih funkcija razreda CoolClass se nalazi ispod fukcije main. Tamo su zapisane adrese
+koje pokazuju na kod virtualnih funkcija razreda CoolClass.
+

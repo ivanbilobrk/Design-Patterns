@@ -1,0 +1,8 @@
+Prednost implementacije u c++ je što smo dobili ljepši kod. Korištenjem predložaka ostvarili smo to da nam prevoditelj pomoću 
+predložaka  sam prepozna kojeg su tipa argumenti funkcija. 
+Zbog toga i prije izvođenja dobit ćemo upozorenja ako recimo predamo kao prvi argument funkcije mymax pokazivač na prvi element
+integer polja, a kao drugi pokazivač na element nekog character polja. 
+Isto tako korištenje Predicate razreda u funkciji mymax je sigurnije jer sada prevoditelj zna kojeg tipa moraju biti argumenti te funkcije koja 
+uspoređuje dvije vrijednosti. 
+Još jedna prednost je ta što u metodama gt_int, gt_char, ... nismo morali primati kao argument void pointer koji onda kasnije 
+moramo castati u neki drugi željeni tip već smo te funkcije mogli ostvariti kao da primaju dvije vrijednosti točno određenog tipa.

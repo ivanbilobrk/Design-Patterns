@@ -1,0 +1,10 @@
+Kako bih ostvario dinamički polimorfizam razrede sam prikazao kao strukture. Svaka struktura u sebi ima pokazivač na virtualnu tablicu te 
+članske varijable koje odgovaraju članskim varijabla u objektno orijentiranim jezicima. Virtualne tablice ostvarene su također putem struktura na način da imaju pokazivače na virtualne metode. Virtualne tablice za 
+pojedine razrede su napravljene kao statičke strukture te se pokazivač na te strukture pridjeljuje svakom primjerku tog razreda, tj. svi 
+primjerci nekog razreda dijele istu virtualnu tablicu. Na taj način kada dodamo nove virtualne metode razreda memorijsko zauzeće 
+će uvijek ostati isto jer jedino što primjerci razreda pamte u strukturi je pokazivač na virtualnu tablicu koji je fiksne veličine. 
+Virtualnim metodama iz objektno orijentiranih jezika odgovaraju sve metode na koje postoje pokazivač u tablici (strukturi) virtualnih metoda. U ovom 
+slučaju to su dogGreet, dogMenu, catGreet, catMenu. Funkcije createDog i createCat su tzv. kreatori jer oni zauzimaju mjesto na heapu za objekt, što bi odgovaralo 
+funkcionalnosti ključne riječi new u objektno orijentiranim jezicima. Nakon što su alocirali memoriju na heapu kreatori zovu konstruktor koji iniciraju 
+članske varijable i pokazivač na tablicu virtualnih metoda. Kreatori vraćaju pokazivač mjesta na heapu gdje se nalazi novostvoreni objekt. Konstruktor u mom rješenju 
+odgovara konstruktoru iz objektno orijentiranih jezika, no tamo je iniciranje tablice virtualnih metoda skriveno. 

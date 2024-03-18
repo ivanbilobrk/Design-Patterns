@@ -1,0 +1,3 @@
+Metodu možemo koristiti kao slobodnu funkciju jer u Pythonu su i funkcije objekti pa zato kad pozovemo mymax(D, D.get) mi ovim drugim
+argumentom proslijedimo referencu na objekt koji je u stvari funkcija. Funkcija D.get vraća vrijednost pojedinog ključa iz rječnika po kojoj 
+možemo usporediti dva objekta i dobiti najveći objekt. 

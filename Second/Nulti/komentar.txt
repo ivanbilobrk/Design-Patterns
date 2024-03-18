@@ -1,0 +1,7 @@
+Ispravno rješenje smo implementirali tako da imamo razred Shape sa dvije čiste virtualne funkcije.
+Konkretni razredi moraju implementirati te funkcije ukoliko naslijede razred Shape. 
+Razrede Circle, Square i Rhomb sam ostvario tako da sam naslijedio razred Shape te implementirao te dvije funkcije.
+Sada funkcije drawShapes i moveShapes ne moraju imati sve one provjere o kojem se Shape objektu radi te putem pokazivača na 
+roditeljski razred Shape pozivaju funkcije translate i draw. Ovo radi zbog dinamičkog polimorfizma te se tijekom izvođenja određuje 
+koja se konkretno funkcija poziva. Sada možemo dodavati još oblika koji naslijeđuju razred Shape te implementiraju te virtualne 
+funkcije, a funkcije moveShapes i drawShapes ne moramo mijenjati. 
